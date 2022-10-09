@@ -74,8 +74,7 @@ MSE_comparison <- function(n, p, Sigma, phi, rho, r, c){
                    function(i) 1/(1 - sum(phi.i[[i]])))
     gamma.pilot <- -2*(t1 + t2)*mult 
 
-  # Using function ARMA.autocov() from ts.extend
-    
+
   b <- floor(seq(n^(0.25), n^(0.6),1))
   a <- n/b
 
