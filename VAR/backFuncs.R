@@ -94,8 +94,9 @@ funOBMi <- function(b, x, y, r, c){
 funCurrbm <- function(b, x, y, r, c)
 {
   mse.bm.curr <-  ((x/b)*(1-r*c)/(1-c))^2 + 
-                  (8*(y^2)*b/n) +  (6*(y^2)*b/(r*n)) + 
-                  (8*y^2*(r-1)/(r*(r - b/n)))*(b^2/n^2)
+                  b/n*(y^2)*(1/r + (r-1)/(r*(1-c)^2)) 
+                  # (8*(y^2)*b/n) +  (6*(y^2)*b/(r*n)) + 
+                  # (8*y^2*(r-1)/(r*(r - b/n)))*(b^2/n^2)
   mse.bm.curr <- na.exclude(mse.bm.curr)
   return(mse.bm.curr)
 }

@@ -54,7 +54,7 @@ batch_sizes <- function(chain, phi, Sigma)
 			}
 		}
 
-  		gamma.pilot <- -2*(foo + (sigma.e - ar.autocovar[1])/2 *
+  		gamma.pilot <- -2*(foo + (Sigma.pilot - ar.autocovar[1])/2 *
   			sum(1:m * phi.i)  )/(1 - sum(phi.i))
   		#%--------------------------------	
 
