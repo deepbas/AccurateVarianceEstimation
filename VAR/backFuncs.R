@@ -32,12 +32,12 @@ funBMexact <- function(b, x, y, r, c){
   gamma1b1 <- 2*sum((1:(b-1))*x[2:b])
   gamma1b1r <- 2*sum((1:(br-1))*x[2:br])
   gamma1n1 <- 2*sum(x[2:n]*seq(1, n-1))
-  exact1 <- (1/(1-c))* (x[1] + (((n/b)*gamma0b1 - gamma0n1)/(n/b -1)) + 
-            (gamma1n1 - (n/b)^2*gamma1b1)/(n*(n-b)/b)) - 
-            (c/(1-c))* (x[1] + (((n/br)*gamma0b1r - gamma0n1)/(n/br -1)) +
-            (gamma1n1 - (n/br)^2*gamma1b1r)/(n*(n-br)/br))
-  bias.exact <- y - exact1
-  variance.exact <- (8*(y^2)*b/n) +  (6*(y^2)*b/(r*n)) + (8*y^2*(r-1)/(r*(r - b/n)))*(b^2/n^2)
+  bias1 <-  y - (x[1] + (n/(n-b))*gamma0b1  - (b/(n-b))*gamma0n1 + (b/(n*(n-b)))*gamma1b1 - (n/(b*(n-b)))*gamma1n1) 
+  bias2 <-  y - (x[1] + (n/(n-br))*gamma0b1r  - (br/(n-br))*gamma0n1 + (br/(n*(n-br)))*gamma1b1r - (n/(br*(n-br)))*gamma1n1)
+  bias.exact <- (1/(1-c))*bias1 - (c/(1-c))*bias2
+  variance.exact <- (2*y^2*b/n)*(b*c^2/(1-c)^2)/(n*r-b) - 
+    (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
+    c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2
   mse.exact <- bias.exact^2 + variance.exact
   return(mse.exact)
 }
@@ -55,10 +55,11 @@ funBMi <- function(b, x, y, r, c){
   gamma0n1 <- 2*sum(x[2:n])
   gamma1b1 <- 2*sum((1:(b-1))*x[2:b])
   gamma1b1r <- 2*sum((1:(br-1))*x[2:br])
-  bias <- (1/(1-c))* ((n/(n-b))*(gamma0n1 - gamma0b1 + (gamma1b1)/b)) -
-    (c/(1-c)* ((n/(n-br))*(gamma0n1 - gamma0b1r + (gamma1b1r)/br)))
+  bias1 <- -((n/(n-b))*(gamma0n1 - gamma0b1 + gamma1b1/b + (b*gamma1n1)/(n^2)))
+  bias2 <- -((n/(n-br))*(gamma0n1 - gamma0b1r + gamma1b1r/br + (br*gamma1n1)/(n^2)))
+  bias <- (1/(1-c))* bias1 - (c/(1-c))* bias2
   var <- (2*(y^2)*b/n) * (1/r + (r-1)/(r*(1-c)^2)) + 
-    (2*(y^2)*(b/n)^2) * ((2*c)/((1-c)^2*r^2) - 2/r) 
+    (2*(y^2)*(b/n)^2) * ((2*c)/((1-c)^2*r^2) - 2/r)
   mse.bm <- bias^2 + var
   return(mse.bm)
 }
@@ -95,8 +96,8 @@ funCurrbm <- function(b, x, y, r, c)
 {
   mse.bm.curr <-  ((x/b)*(1-r*c)/(1-c))^2 + 
                   b/n*(y^2)*(1/r + (r-1)/(r*(1-c)^2)) 
-                  # (8*(y^2)*b/n) +  (6*(y^2)*b/(r*n)) + 
-                  # (8*y^2*(r-1)/(r*(r - b/n)))*(b^2/n^2)
+                  # (2*(y^2)*b/n) * (1/r + (r-1)/(r*(1-c)^2)) + 
+                  # (2*(y^2)*(b/n)^2) * ((2*c)/((1-c)^2*r^2) - 2/r)
   mse.bm.curr <- na.exclude(mse.bm.curr)
   return(mse.bm.curr)
 }
