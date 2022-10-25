@@ -4,7 +4,7 @@
 
 sigphi <- function(p, rho)
 {
-  set.seed(1692, kind = "L'Ecuyer-CMRG" )
+  set.seed(16235, kind = "L'Ecuyer-CMRG") 
   A <- matrix(rnorm(p*p, mean = 0, sd = 1), p, p)
   B <- A %*% t(A)
   m <- max(eigen(B)$values)
@@ -97,7 +97,7 @@ funOBMi <- function(b, x, y, r, c){
 funCurrbm <- function(b, x, y, r, c)
 {
   mse.bm.curr <-  ((x/b)*(1-r*c)/(1-c))^2 + 
-                  b/n*(y^2)*(1/r + (r-1)/(r*(1-c)^2)) 
+                  2*b/n*(y^2)*(1/r + (r-1)/(r*(1-c)^2)) 
                   mse.bm.curr <- na.exclude(mse.bm.curr)
   return(mse.bm.curr)
 }

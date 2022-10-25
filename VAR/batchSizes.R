@@ -12,7 +12,7 @@ batch_sizes <- function(chain, phi, Sigma)
 	p 			<- dim(chain)[2]
 	n 			<- dim(chain)[1]
 	c  			<-  1/2
-	b 			<- seq(10,1.5*n^(1/2))
+	b 			<- seq(1,n^(0.62),1)
 	a 			<- n/b
  	ubound 		<- 2*sqrt(log(n)/n) # needed for lag-based
 
@@ -74,7 +74,7 @@ batch_sizes <- function(chain, phi, Sigma)
 		                     y  = diag(Sigma)[i], 
 		                     r  = k, c = c, 
 		                     method = "Brent",
-		                     lower = c(0), upper=c(200))$par)	
+		                     lower = c(0), upper=c(5000))$par)	
 
 		# Estimated batch size - our method
 		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
@@ -83,7 +83,7 @@ batch_sizes <- function(chain, phi, Sigma)
                        y  = Sigma.pilot, 
                        r  = k, c = c, 
                        method = "Brent",
-                       lower = c(0), upper=c(200))$par)
+                       lower = c(0), upper=c(5000))$par)
 
 		# Current first order method
 		b.curr.bm[i, ] <- sapply(1:3, function(k)  optim(par = c(40), 
@@ -91,7 +91,7 @@ batch_sizes <- function(chain, phi, Sigma)
                         x  = gamma.pilot, 
                         y  = Sigma.pilot, 
                         r  = k, c = c, method = "Brent", 
-                        lower = c(0), upper = c(200))$par)
+                        lower = c(0), upper = c(5000))$par)
 
 		# Politis method
 		ar.autocorr <- abs(acf(chain[,i], lag.max = n-1, 
