@@ -17,8 +17,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-[Previously saved workspace restored]
-
 > set.seed(16235, kind = "L'Ecuyer-CMRG" )
 > source("batchSizes.R")
 > source("backFuncs.R")
@@ -99,4 +97,4 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > proc.time()
     user   system  elapsed 
-2002.223   50.584   50.657 
+2248.894   55.141   56.095 

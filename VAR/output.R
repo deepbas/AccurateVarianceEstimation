@@ -23,6 +23,7 @@ for(i in 1:length(rho))
 	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][3,])))
 }
 
+pdf("plots/var_batches.pdf", height = 6, width = 6)
 plot(rho, lug1[,1], type = "n", ylim = range(cbind(lug1, lug2, lug3)))
 for(i in 1:3)
 {
@@ -31,3 +32,4 @@ for(i in 1:3)
 	lines(rho, lug3[,i], col = i, lty = 3)
 }
 legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1, col = 1:3)
+dev.off()

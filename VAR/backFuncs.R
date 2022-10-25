@@ -55,6 +55,7 @@ funBMi <- function(b, x, y, r, c){
   gamma0n1 <- 2*sum(x[2:n])
   gamma1b1 <- 2*sum((1:(b-1))*x[2:b])
   gamma1b1r <- 2*sum((1:(br-1))*x[2:br])
+  gamma1n1 <- 2*sum(x[2:n]*seq(1, n-1))
   bias1 <- -((n/(n-b))*(gamma0n1 - gamma0b1 + gamma1b1/b + (b*gamma1n1)/(n^2)))
   bias2 <- -((n/(n-br))*(gamma0n1 - gamma0b1r + gamma1b1r/br + (br*gamma1n1)/(n^2)))
   bias <- (1/(1-c))* bias1 - (c/(1-c))* bias2
