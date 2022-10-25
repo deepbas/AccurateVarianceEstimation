@@ -58,8 +58,9 @@ funBMi <- function(b, x, y, r, c){
   bias1 <- -((n/(n-b))*(gamma0n1 - gamma0b1 + gamma1b1/b + (b*gamma1n1)/(n^2)))
   bias2 <- -((n/(n-br))*(gamma0n1 - gamma0b1r + gamma1b1r/br + (br*gamma1n1)/(n^2)))
   bias <- (1/(1-c))* bias1 - (c/(1-c))* bias2
-  var <- (2*(y^2)*b/n) * (1/r + (r-1)/(r*(1-c)^2)) + 
-    (2*(y^2)*(b/n)^2) * ((2*c)/((1-c)^2*r^2) - 2/r)
+  var <- (2*y^2*b/n)*(b*c^2/(1-c)^2)/(n*r-b) - 
+    (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
+    c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2
   mse.bm <- bias^2 + var
   return(mse.bm)
 }
@@ -96,9 +97,7 @@ funCurrbm <- function(b, x, y, r, c)
 {
   mse.bm.curr <-  ((x/b)*(1-r*c)/(1-c))^2 + 
                   b/n*(y^2)*(1/r + (r-1)/(r*(1-c)^2)) 
-                  # (2*(y^2)*b/n) * (1/r + (r-1)/(r*(1-c)^2)) + 
-                  # (2*(y^2)*(b/n)^2) * ((2*c)/((1-c)^2*r^2) - 2/r)
-  mse.bm.curr <- na.exclude(mse.bm.curr)
+                  mse.bm.curr <- na.exclude(mse.bm.curr)
   return(mse.bm.curr)
 }
 
