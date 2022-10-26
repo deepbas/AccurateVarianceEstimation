@@ -47,7 +47,7 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > #%-------------------------------------------------
 > # Simulation settings
 > p <- 4
-> rho <- seq(0.80, 0.99, by = 0.03)
+> rho <- seq(0.80, 0.95, by = 0.01)
 > n <- 2e4
 > nrep <- 50
 > omega <- diag(p)
@@ -84,12 +84,21 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 + 	}	
 + }
 [1] "Doing rho =  0.8"
+[1] "Doing rho =  0.81"
+[1] "Doing rho =  0.82"
 [1] "Doing rho =  0.83"
+[1] "Doing rho =  0.84"
+[1] "Doing rho =  0.85"
 [1] "Doing rho =  0.86"
+[1] "Doing rho =  0.87"
+[1] "Doing rho =  0.88"
 [1] "Doing rho =  0.89"
+[1] "Doing rho =  0.9"
+[1] "Doing rho =  0.91"
 [1] "Doing rho =  0.92"
+[1] "Doing rho =  0.93"
+[1] "Doing rho =  0.94"
 [1] "Doing rho =  0.95"
-[1] "Doing rho =  0.98"
 > 
 > save(file = "var_out", sims_for_rho, phis, true_Sigmas, rho)
 > 
@@ -97,4 +106,4 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > proc.time()
     user   system  elapsed 
-2248.894   55.141   56.095 
+5103.863  132.089  125.642 
