@@ -91,7 +91,6 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 + 	{
 + 
 + 		chain <- as.matrix(ar1(N = n, phi = phis[[s]][1,1], omega = omega[1,1], start = 0))
-+ 		#as.matrix(mAr.sim(rep(0,p), as.matrix(phis[[s]]), omega, N = n))
 + 		est_var(chain = chain, phi = phis[[s]], Sigma = true_Sigmas[[s]])
 + 	}	
 + }
@@ -117,5 +116,5 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > 
 > proc.time()
-    user   system  elapsed 
-1024.651   63.161  290.824 
+   user  system elapsed 
+728.541  53.487 210.166 

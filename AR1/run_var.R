@@ -36,6 +36,17 @@ detectCores()
 # this tells the machine to register the 4 cores
 registerDoParallel(cores = detectCores()-2)
 
+ar1 <- function(N, phi, omega, start)
+{
+	out <- numeric(length = N)
+	out[1] <- start
+	eps <- rnorm(N, sd = sqrt(omega))
+	for(t in 2:N)
+	{
+		out[t] <- phi*out[t-1] + eps[t]
+	}
+	return(out)
+}
 # for all values of rho
 for(s in 1:length(rho))
 {
@@ -48,7 +59,7 @@ for(s in 1:length(rho))
 	sims_for_rho[[s]] 	<- foreach(st = 1:nrep) %dopar% 
 	{
 
-		chain <- as.matrix(mAr.sim(rep(0,p), as.matrix(phis[[s]]), omega, N = n))
+		chain <- as.matrix(ar1(N = n, phi = phis[[s]][1,1], omega = omega[1,1], start = 0))
 		est_var(chain = chain, phi = phis[[s]], Sigma = true_Sigmas[[s]])
 	}	
 }
