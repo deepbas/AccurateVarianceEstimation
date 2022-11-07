@@ -26,15 +26,22 @@ funBMexact <- function(b, x, y, r, c){
   n <- length(x)
   b <- floor(b)
   br <- floor(b/r)
+  a <- floor(n/b)
+  ar <- floor(n/br)
+
   gamma0b1 <- 2*sum(x[2:b])
   gamma0b1r <- 2*sum(x[2:br])
-  gamma0n1 <- 2*sum(x[2:n])
+  gamma0n1 <- 2*sum(x[(b+1):n])
   gamma1b1 <- 2*sum((1:(b-1))*x[2:b])
   gamma1b1r <- 2*sum((1:(br-1))*x[2:br])
-  gamma1n1 <- 2*sum(x[2:n]*seq(1, n-1))
-  bias1 <-  y - (x[1] + (n/(n-b))*gamma0b1  - (b/(n-b))*gamma0n1 + (b/(n*(n-b)))*gamma1b1 - (n/(b*(n-b)))*gamma1n1) 
-  bias2 <-  y - (x[1] + (n/(n-br))*gamma0b1r  - (br/(n-br))*gamma0n1 + (br/(n*(n-br)))*gamma1b1r - (n/(br*(n-br)))*gamma1n1)
-  bias.exact <- (1/(1-c))*bias1 - (c/(1-c))*bias2
+  gamma1n1 <- 2*sum(x[(b+1):n]*seq(1, n-1))
+
+  bias1 <- x[1] + gamma0b1 - (a + 1)/(a*b)*gamma1b1 - 
+          1/(a - 1)*(gamma0n1  -  gamma1n1/n )
+  bias2 <- x[1] + gamma0b1r - (ar + 1)/(ar*br)*gamma1b1r - 
+          1/(ar - 1)*(gamma0n1  -  gamma1n1/n )          
+  bias.exact <- y - ( (1/(1-c))*bias1 - (c/(1-c))*bias2)
+
   variance.exact <- (2*y^2*b/n)*(b*c^2/(1-c)^2)/(n*r-b) - 
     (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
     c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2
