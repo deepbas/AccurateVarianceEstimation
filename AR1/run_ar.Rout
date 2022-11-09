@@ -19,7 +19,7 @@ Type 'q()' to quit R.
 
 > set.seed(16235, kind = "L'Ecuyer-CMRG" )
 > source("batchSizes.R")
-> source("backFuncs.R")
+> source("../backFuncs.R")
 > #%-------------------------------------------------
 > pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 > 
@@ -111,10 +111,10 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 [1] "Doing rho =  0.94"
 [1] "Doing rho =  0.95"
 > 
-> save(file = "var_out", sims_for_rho, phis, true_Sigmas, rho)
+> save(file = "ar1_out", sims_for_rho, phis, true_Sigmas, rho)
 > 
 > 
 > 
 > proc.time()
    user  system elapsed 
-996.219  78.624  29.394 
+993.000  79.234  29.236 

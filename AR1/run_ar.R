@@ -1,6 +1,6 @@
 set.seed(16235, kind = "L'Ecuyer-CMRG" )
 source("batchSizes.R")
-source("backFuncs.R")
+source("../backFuncs.R")
 #%-------------------------------------------------
 pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 
@@ -64,6 +64,6 @@ for(s in 1:length(rho))
 	}	
 }
 
-save(file = "var_out", sims_for_rho, phis, true_Sigmas, rho)
+save(file = "ar1_out", sims_for_rho, phis, true_Sigmas, rho)
 
 

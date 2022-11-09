@@ -1,7 +1,7 @@
 ##############################
 ## Analysing the output
 ##############################
-load("var_out")
+load("ar1_out")
 
 nreps 	<- length(sims_for_rho[[1]])
 
@@ -23,7 +23,7 @@ for(i in 1:length(rho))
 	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][3,])))
 }
 
-pdf("plots/var_batches.pdf", height = 6, width = 6)
+pdf("plots/ar1_batches.pdf", height = 6, width = 6)
 plot(rho, lug1[,1], type = "n", 
 	ylim = range(cbind(lug1, lug2, lug3)),
 	ylab = "Batch Size", xlab = expression(rho))

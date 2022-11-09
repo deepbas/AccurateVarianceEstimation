@@ -7,7 +7,7 @@
 # p = dimension of the problem
 # Sigma =  true matrix to be estimated
 # phi = phi in VAR(1)
-batch_sizes <- function(chain, phi, Sigma)
+batch_sizes <- function(chain, phi, Sigma, exact_autcov)
 {
 	p 			<- dim(chain)[2]
 	n 			<- dim(chain)[1]
@@ -64,18 +64,19 @@ batch_sizes <- function(chain, phi, Sigma)
   		# will combine outside loop
 		#%--------------------------------	
 
-		ar.autocovar   <- ARMA.autocov(n = n, ar = phi.i, 
-							ma = 0, corr = FALSE)
+
 
 		# Exact theoretically optimal batch size
 		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(40),
 		                     fn = funBMexact, 
-		                     x  = ar.autocovar, 
+		                     x  = exact_autcov[,i], 
 		                     y  = diag(Sigma)[i], 
 		                     r  = k, c = c, 
 		                     method = "Brent",
 		                     lower = c(0), upper=c(5000))$par)	
 
+		ar.autocovar   <- ARMA.autocov(n = n, ar = phi.i, 
+							ma = 0, corr = FALSE)
 		# Estimated batch size - our method
 		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
                        fn =funBMi,  
@@ -127,10 +128,10 @@ batch_sizes <- function(chain, phi, Sigma)
 	return(list(b.sizes, b.politis))
 }
 
-est_var <- function(chain, phi, Sigma)
+est_var <- function(chain, phi, Sigma, exact_autcov)
 {
 	# Find all batch sizes
-	batchObj <- batch_sizes(chain, phi, Sigma)
+	batchObj <- batch_sizes(chain, phi, Sigma, exact_autcov)
 
 	exactBM		<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[[1]][k,1]), r = k)$cov)
 	secondBM 	<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[[1]][k,2]), r = k)$cov)
