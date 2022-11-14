@@ -17,9 +17,9 @@ pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 #%-------------------------------------------------
 # Simulation settings
 p <- 1
-rho <- seq(0.80, 0.95, by = 0.01)
+rho <- seq(0.85, 0.99, by = 0.01)
 n <- 2e4
-nrep <- 50
+nrep <- 2
 omega <- diag(p)
 #%-------------------------------------------------
 

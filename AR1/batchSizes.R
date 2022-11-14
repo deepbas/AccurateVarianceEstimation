@@ -69,13 +69,21 @@ batch_sizes <- function(chain, phi, Sigma)
 							ma = 0, corr = FALSE)
 
 		# Exact theoretically optimal batch size
+
+		# foo <- optim(par = c(40),
+  #                    fn = funBMexact, 
+  #                    x  = exact.autocov, 
+  #                    y  = diag(Sigma)[i], 
+  #                    r  = 1, c = c, 
+  #                    method = "Brent",
+  #                    lower = c(0), upper=c(5000))$par
+
 		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(40),
 		                     fn = funBMexact, 
 		                     x  = exact.autocov, 
 		                     y  = diag(Sigma)[i], 
 		                     r  = k, c = c, 
-		                     method = "Brent",
-		                     lower = c(0), upper=c(5000))$par)	
+		                     method = "BFGS")$par)	
 
 		# Estimated batch size - our method
 		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
@@ -83,16 +91,14 @@ batch_sizes <- function(chain, phi, Sigma)
                        x  = ar.autocovar, 
                        y  = Sigma.pilot, 
                        r  = k, c = c, 
-                       method = "Brent",
-                       lower = c(0), upper=c(5000))$par)
+                       method = "BFGS")$par)
 
 		# Current first order method
 		b.curr.bm[i, ] <- sapply(1:3, function(k)  optim(par = c(40), 
                         fn = funCurrbm,  
                         x  = gamma.pilot, 
                         y  = Sigma.pilot, 
-                        r  = k, c = c, method = "Brent", 
-                        lower = c(0), upper = c(5000))$par)
+                        r  = k, c = c, method = "BFGS")$par)
 
 		# Politis method
 		ar.autocorr <- abs(acf(chain[,i], lag.max = n-1, 

@@ -32,14 +32,17 @@ funBMexact <- function(b, x, y, r, c){
   gamma0b1 <- 2*sum(x[2:b])
   gamma0b1r <- 2*sum(x[2:br])
   gamma0n1 <- 2*sum(x[(b+1):n])
+  gamma0n1r <- 2*sum(x[(br+1):n])
+
   gamma1b1 <- 2*sum((1:(b-1))*x[2:b])
   gamma1b1r <- 2*sum((1:(br-1))*x[2:br])
-  gamma1n1 <- 2*sum(x[(b+1):n]*seq(1, n-1))
+  gamma1n1 <- 2*sum(x[(b+1):n]*(b:(n-1)))
+  gamma1n1r <- 2*sum(x[(br+1):n]*(br:(n-1)))
 
   bias1 <- x[1] + gamma0b1 - (a + 1)/(a*b)*gamma1b1 - 
           1/(a - 1)*(gamma0n1  -  gamma1n1/n )
   bias2 <- x[1] + gamma0b1r - (ar + 1)/(ar*br)*gamma1b1r - 
-          1/(ar - 1)*(gamma0n1  -  gamma1n1/n )          
+          1/(ar - 1)*(gamma0n1r  -  gamma1n1r/n )          
   bias.exact <- y - ( (1/(1-c))*bias1 - (c/(1-c))*bias2)
 
   variance.exact <- (2*y^2*b/n)*(b*c^2/(1-c)^2)/(n*r-b) - 
