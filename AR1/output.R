@@ -63,14 +63,21 @@ colnames(lug1) <- c("exact", "second-order", "first-order")
 colnames(lug2) <- c("exact", "second-order", "first-order")
 colnames(lug3) <- c("exact", "second-order", "first-order")
 
+sig <- as.matrix(true_Sigmas[[i]])
 par(mfrow = c(3,1))
-boxplot(lug1, main = "r = 1")
-abline(h = true_Sigmas[i][[1]][1,1])
+boxplot(lug1, main = "r = 1", ylab = "MSE")
+abline(h = sig[1,1])
 
-boxplot(lug2, main = "r = 2")
-abline(h = true_Sigmas[i][[1]][1,1])
+boxplot(lug2, main = "r = 2", ylab = "MSE")
+abline(h = sig[1,1])
+
+boxplot(lug3, main = "r = 3", ylab = "MSE")
+abline(h = sig[1,1])
+dev.off()
+
+colMeans( (lug1- sig[1,1])^2)/1e6
+colMeans( (lug2 - sig[1,1])^2)/1e6
+colMeans( (lug3 - sig[1,1])^2)/1e6
 
 
-boxplot(lug3, main = "r = 3")
-abline(h = true_Sigmas[i][[1]][1,1])
 

@@ -1,6 +1,6 @@
 
-R version 4.2.1 (2022-06-23) -- "Funny-Looking Kid"
-Copyright (C) 2022 The R Foundation for Statistical Computing
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-apple-darwin17.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -58,7 +58,60 @@ Type 'q()' to quit R.
 null device 
           1 
 > 
+> lug1 <- matrix(0, nrow = length(rho), ncol = 3)
+> lug2 <- matrix(0, nrow = length(rho), ncol = 3)
+> lug3 <- matrix(0, nrow = length(rho), ncol = 3)
+> 
+> for(i in 1:length(rho))
++ {
++ 	Sigma <- true_Sigmas[[i]]
++ 	phi <- phis[[i]]
++ 	rho_this <- rho[i]
++ 
++ 	main_out <- sims_for_rho[[i]]
++ 
++ 
++ 	exact <- t(sapply(main_out, function(x) unlist(x[[2]])))
++ 	second <- t(sapply(main_out, function(x) unlist(x[[3]])))
++ 	first <- t(sapply(main_out, function(x) unlist(x[[4]])))
++ }
+> 
+> lug1 <- (cbind(exact[,1], second[,1], first[,1]))# - true_Sigmas[i][[1]][1,1])^2
+> lug2 <- (cbind(exact[,2], second[,2], first[,2]))# - true_Sigmas[i][[1]][1,1])^2
+> lug3 <- (cbind(exact[,3], second[,3], first[,3]))# - true_Sigmas[i][[1]][1,1])^2
+> 
+> colnames(lug1) <- c("exact", "second-order", "first-order")
+> colnames(lug2) <- c("exact", "second-order", "first-order")
+> colnames(lug3) <- c("exact", "second-order", "first-order")
+> 
+> sig <- as.matrix(true_Sigmas[[i]])
+Loading required package: Matrix
+> par(mfrow = c(3,1))
+> boxplot(lug1, main = "r = 1", ylab = "MSE")
+> abline(h = sig[1,1])
+> 
+> boxplot(lug2, main = "r = 2", ylab = "MSE")
+> abline(h = sig[1,1])
+> 
+> boxplot(lug3, main = "r = 3", ylab = "MSE")
+> abline(h = sig[1,1])
+> dev.off()
+null device 
+          1 
+> 
+> colMeans( (lug1- sig[1,1])^2)/1e6
+       exact second-order  first-order 
+    6.791814     8.865900     4.148225 
+> colMeans( (lug2 - sig[1,1])^2)/1e6
+       exact second-order  first-order 
+    8.283812     9.519665    81.151969 
+> colMeans( (lug3 - sig[1,1])^2)/1e6
+       exact second-order  first-order 
+    2.065997     2.685145     5.747917 
+> 
+> 
+> 
 > 
 > proc.time()
    user  system elapsed 
-  0.188   0.035   0.219 
+  0.938   0.072   1.019 

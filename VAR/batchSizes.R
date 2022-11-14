@@ -65,34 +65,39 @@ batch_sizes <- function(chain, phi, Sigma, exact_autcov)
 		#%--------------------------------	
 
 
+foo <- optim(par = c(40),
+                     fn = funBMexact, 
+                     x  = exact_autcov, 
+                     y  = diag(Sigma)[i], 
+                     r  = 2, c = c, 
+                     method = "Brent",
+                     lower = c(0), upper=c(5000))$par
 
-		# Exact theoretically optimal batch size
-		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(40),
+		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(100),
 		                     fn = funBMexact, 
-		                     x  = exact_autcov[,i], 
+		                     x  = exact_autcov, 
 		                     y  = diag(Sigma)[i], 
 		                     r  = k, c = c, 
-		                     method = "Brent",
-		                     lower = c(0), upper=c(5000))$par)	
+		                     method = "Brent", lower = 5, 
+		                     upper = ((k == 1)*5000 + (k >= 2)*(foo + 10) ) )$par)	
 
-		ar.autocovar   <- ARMA.autocov(n = n, ar = phi.i, 
-							ma = 0, corr = FALSE)
 		# Estimated batch size - our method
 		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
                        fn =funBMi,  
                        x  = ar.autocovar, 
                        y  = Sigma.pilot, 
                        r  = k, c = c, 
-                       method = "Brent",
-                       lower = c(0), upper=c(5000))$par)
+                       method = "Brent", lower = 5, 
+		               upper = ((k == 1)*5000 + (k >= 2)*(foo + 10) ) )$par)	
 
 		# Current first order method
 		b.curr.bm[i, ] <- sapply(1:3, function(k)  optim(par = c(40), 
                         fn = funCurrbm,  
                         x  = gamma.pilot, 
                         y  = Sigma.pilot, 
-                        r  = k, c = c, method = "Brent", 
-                        lower = c(0), upper = c(5000))$par)
+                        r  = k, c = c, 
+                        method = "Brent", lower = 5, 
+		                upper = ((k == 1)*5000 + (k >= 2)*(foo + 10) ) )$par)	
 
 		# Politis method
 		ar.autocorr <- abs(acf(chain[,i], lag.max = n-1, 

@@ -19,7 +19,7 @@ pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 p <- 1
 rho <- seq(0.85, 0.99, by = 0.01)
 n <- 2e4
-nrep <- 2
+nrep <- 50
 omega <- diag(p)
 #%-------------------------------------------------
 
