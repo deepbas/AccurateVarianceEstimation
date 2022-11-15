@@ -18,7 +18,7 @@ pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 # Simulation settings
 p <- 1
 rho <- seq(0.85, 0.99, by = 0.01)
-n <- 2e4
+n <- 5e3
 nrep <- 50
 omega <- diag(p)
 #%-------------------------------------------------
@@ -58,6 +58,7 @@ for(s in 1:length(rho))
 	## a doParallel for reps
 	sims_for_rho[[s]] 	<- foreach(st = 1:nrep) %dopar% 
 	{
+
 
 		chain <- as.matrix(ar1(N = n, phi = phis[[s]][1,1], omega = omega[1,1], start = 0))
 		est_var(chain = chain, phi = phis[[s]], Sigma = true_Sigmas[[s]])

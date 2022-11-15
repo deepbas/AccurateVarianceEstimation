@@ -73,7 +73,7 @@ abline(h = sig[1,1])
 
 boxplot(lug3, main = "r = 3", ylab = "MSE")
 abline(h = sig[1,1])
-dev.off()
+# dev.off()
 
 colMeans( (lug1- sig[1,1])^2)/1e6
 colMeans( (lug2 - sig[1,1])^2)/1e6
