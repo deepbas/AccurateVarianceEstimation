@@ -68,17 +68,6 @@ batch_sizes <- function(chain, phi, Sigma)
 		ar.autocovar   <- ARMA.autocov(n = n, ar = phi.i, 
 							ma = 0, corr = FALSE)
 
-		# dum <- -2*sum( (0:(n-1)* exact.autocov))
-		# Exact theoretically optimal batch size
-
-		# foo <- optim(par = c(40),
-  #                    fn = funBMexact, 
-  #                    x  = exact.autocov, 
-  #                    y  = diag(Sigma)[i], 
-  #                    r  = 2, c = c, 
-  #                    method = "Brent",
-  #                    lower = c(0), upper=c(5000))$par
-
 		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(100),
 		                     fn = funBMexact, 
 		                     x  = exact.autocov, 
@@ -90,7 +79,7 @@ batch_sizes <- function(chain, phi, Sigma)
 		# Estimated batch size - our method
 		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
                        fn =funBMi,  
-                       x  = ar.autocovar , 
+                       x  = ar.autocovar, 
                        y  = Sigma.pilot, 
                        r  = k, c = c, 
                        method = "Brent", lower = 5, 
@@ -98,7 +87,8 @@ batch_sizes <- function(chain, phi, Sigma)
 
 		# Current first order method
 		b.curr.bm[i, ] <- sapply(1:3, function(k)  optim(par = c(40), 
-                        fn = funCurrbm,  
+                        fn = funCurrbm, 
+                        n  = n, 
                         x  = gamma.pilot, 
                         y  = Sigma.pilot, 
                         r  = k, c = c, 

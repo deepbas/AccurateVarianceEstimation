@@ -1,7 +1,7 @@
 library(mcmcse)
-n <- 1e4
+n <- 5e4
 b <- 50
-rho <- .99
+rho <- .995
 
 reps <- 1e3
 truth <- 1/(1 - rho)^2
@@ -56,15 +56,16 @@ theory/var(est[,2])
 
 #################
 ## Checking bias
-n <- 1e4
+pdf("plots/bias-variance-995-n5e3r3.pdf", height = 5, width = 12)
+n <- 5e3
 b <- 100
 c <- 1/2
-r <- 1
-rho <- .993
+r <- 3
+rho <- .995
 
+par(mfrow = c(1,3))
 temp <- function(b)
 {
-  r <- 1
   br <- b/r
   a <- n/b
   ar <- n/br
@@ -94,13 +95,13 @@ temp <- function(b)
 temp2 <- function(b)
 {
   a <- n/b
-    phi <- rho
+  phi <- rho
   x <- phi^(0:(n-1))*(1/(1 - phi^2))
   x <- -2*sum( (0:(n-1)* x))
   out <- (x*(a+1)/n)*(1-r*c)/(1-c)
 }
 
-bs <- seq(10, n/10, length = 1e3)
+bs <- seq(50, n/3, length = 1e3)
 foo <- numeric(length = length(bs))
 foo2 <- numeric(length = length(bs))
 for(i in 1:length(bs))
@@ -108,12 +109,16 @@ for(i in 1:length(bs))
   foo[i] <- temp(bs[i])
   foo2[i] <- temp2(bs[i])
 }
-plot(bs, foo, type = "l", ylim = range(c(foo, foo2)))
+plot(bs, foo, type = "l", ylim = range(c(foo, foo2)),
+  main = "Bias",  xlab = "Batch Size", ylab = "Bias", col = "blue")
 lines(bs, foo2, col = "red")
+legend("bottomright", legend = c("First-Order", "Exact"),
+  col = c("blue", "red"), lty = 1)
+
 # theory - (truth - mean(est[,1]))
 
 
-
+ y <- 1/(1-rho)^2
 temp <- function(b)
 {
   (2*y^2*b/n)* (1 + b/(n-b) + 
@@ -131,9 +136,11 @@ for(i in 1:length(bs))
   foo[i] <- temp(bs[i])
   foo2[i] <- temp2(bs[i])
 }
-plot(bs, foo, type = "l", ylim = range(c(foo, foo2)))
+plot(bs, foo, type = "l", ylim = range(c(foo, foo2)),
+  main = "Variance",  xlab = "Batch Size", ylab = "Variance", col = "blue")
 lines(bs, foo2, col = "red")
-
+legend("bottomright", legend = c("First-Order", "Almost Exact"),
+  col = c("blue", "red"), lty = 1)
 
 
 
@@ -182,7 +189,7 @@ temp2 <- function(b)
   bias^2 + variance
 }
 
-bs <- seq(5, n/5, length = 5e2)
+bs <- seq(50, 2000, length = 5e2)
 foo <- numeric(length = length(bs))
 foo2 <- numeric(length = length(bs))
 for(i in 1:length(bs))
@@ -190,6 +197,12 @@ for(i in 1:length(bs))
   foo[i] <- temp(bs[i])
   foo2[i] <- temp2(bs[i])
 }
-plot(bs, foo, type = "l", ylim = range(c(foo, foo2)))
+plot(bs, foo, type = "l", ylim = range(c(foo, 10*foo)) ,
+  main = "Mean-squared Error",  xlab = "Batch Size", ylab = "MSE", col = "blue")
 lines(bs, foo2, col = "red")
+abline(v = bs[which.min(foo)], lty = 2, col = "blue")
+abline(v = bs[which.min(foo2)], lty = 2, col = "red")
+legend("topright", legend = c("First-Order", "Almost Exact"),
+  col = c("red", "blue"), lty = 1)
 
+dev.off()

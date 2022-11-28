@@ -111,7 +111,7 @@ funOBMi <- function(b, x, y, r, c){
 
 ## -----------------------------------------------------
 # current
-funCurrbm <- function(b, x, y, r, c)
+funCurrbm <- function(b, n, x, y, r, c)
 {
   a <- n/b
   mse.bm.curr <-  ((x*(a+1)/n)*(1-r*c)/(1-c))^2 + 

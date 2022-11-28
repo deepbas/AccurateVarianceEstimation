@@ -20,6 +20,18 @@ Type 'q()' to quit R.
 > set.seed(16235, kind = "L'Ecuyer-CMRG" )
 > source("batchSizes.R")
 > source("../backFuncs.R")
+> 
+> ar1 <- function(N, phi, omega, start)
++ {
++ 	out <- numeric(length = N)
++ 	out[1] <- start
++ 	eps <- rnorm(N, sd = sqrt(omega))
++ 	for(t in 2:N)
++ 	{
++ 		out[t] <- phi*out[t-1] + eps[t]
++ 	}
++ 	return(out)
++ }
 > #%-------------------------------------------------
 > pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 > 
@@ -45,17 +57,51 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
       TRUE       TRUE       TRUE       TRUE       TRUE 
 > 
 > #%-------------------------------------------------
+> ############################################
+> ## file runs running estimation
+> ############################################
+> 
+> 
+> # n = length of Markov chain
+> # p = dimension of the problem
+> # Sigma =  true matrix to be estimated
+> # phi = phi in VAR(1)
+> 
+> running_est <- function(chain, phi, Sigma, 
++ 	nseq = c(1e3, 3e3, 5e3, 1e4, 2e4))
++ {
++ 	# Find all batch sizes
++ 	est_n <- list(length(nseq))
++ 	for(nind in 1:length(nseq))
++ 	{
++ 		n.ind <- nseq[nind]
++ 		sub.chain <- matrix(chain[1:n.ind, ])
++ 		batchObj <- batch_sizes(sub.chain, phi, Sigma)
++ 
++ 		exactBM		<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,1]), r = k)$cov)
++ 		secondBM 	<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,2]), r = k)$cov)
++ 		firstBM 	<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,3]), r = k)$cov)
++ 		politBM 	<- mcse.multi(chain, size = ceiling(batchObj[[2]]), r = 2)$cov
++ 
++ 		est_n[[nind]] <- list("batches" = batchObj,
++ 		"exactBM" = exactBM, "secondBM" = secondBM,
++ 		"firstBM" = firstBM, "politBM" = politBM)
++ 	}
++ 
++ 	return(est_n)
++ }
+> 
+> 
 > # Simulation settings
 > p <- 1
-> rho <- seq(0.95, 0.998, by = 0.002)
-> n <- 5e3
-> nrep <- 100
+> rho <- .99
+> nrep <- 50
 > omega <- diag(p)
 > #%-------------------------------------------------
 > 
 > true_Sigmas  <- list(length = length(rho))
 > phis		 <- list(length = length(rho))
-> sims_for_rho <- list(length = length(rho))
+> sims_for_n <- list(length = length(rho))
 > # generating VAR(1) process
 > 
 > detectCores()
@@ -67,64 +113,22 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > # this tells the machine to register the 4 cores
 > registerDoParallel(cores = detectCores()-2)
 > 
-> ar1 <- function(N, phi, omega, start)
-+ {
-+ 	out <- numeric(length = N)
-+ 	out[1] <- start
-+ 	eps <- rnorm(N, sd = sqrt(omega))
-+ 	for(t in 2:N)
-+ 	{
-+ 		out[t] <- phi*out[t-1] + eps[t]
-+ 	}
-+ 	return(out)
-+ }
+> 
 > # for all values of rho
-> for(s in 1:length(rho))
+> temp 	<- sigphi(p, rho)
+> phis 	<- temp[[1]]
+> true_Sigmas	<- temp[[2]]
+> nseq <- c(1e3, 3e3, 5e3, 1e4, 2e4)
+> ## a doParallel for reps
+> sims_for_n 	<- foreach(st = 1:nrep) %dopar% 
 + {
-+ 	print(paste("Doing rho = ", rho[s]))
-+ 	temp 	<- sigphi(p, rho[s])
-+ 	phis[[s]] 	<- temp[[1]]
-+ 	true_Sigmas[[s]] 	<- temp[[2]]
-+ 
-+ 	## a doParallel for reps
-+ 	sims_for_rho[[s]] 	<- foreach(st = 1:nrep) %dopar% 
-+ 	{
-+ 
-+ 
-+ 		chain <- as.matrix(ar1(N = n, phi = phis[[s]][1,1], omega = omega[1,1], start = 0))
-+ 		est_var(chain = chain, phi = phis[[s]], Sigma = true_Sigmas[[s]])
-+ 	}	
-+ }
-[1] "Doing rho =  0.95"
-[1] "Doing rho =  0.952"
-[1] "Doing rho =  0.954"
-[1] "Doing rho =  0.956"
-[1] "Doing rho =  0.958"
-[1] "Doing rho =  0.96"
-[1] "Doing rho =  0.962"
-[1] "Doing rho =  0.964"
-[1] "Doing rho =  0.966"
-[1] "Doing rho =  0.968"
-[1] "Doing rho =  0.97"
-[1] "Doing rho =  0.972"
-[1] "Doing rho =  0.974"
-[1] "Doing rho =  0.976"
-[1] "Doing rho =  0.978"
-[1] "Doing rho =  0.98"
-[1] "Doing rho =  0.982"
-[1] "Doing rho =  0.984"
-[1] "Doing rho =  0.986"
-[1] "Doing rho =  0.988"
-[1] "Doing rho =  0.99"
-[1] "Doing rho =  0.992"
-[1] "Doing rho =  0.994"
-[1] "Doing rho =  0.996"
-[1] "Doing rho =  0.998"
-> 
-> save(file = "ar1_out", sims_for_rho, phis, true_Sigmas, rho)
++ 	chain <- as.matrix(ar1(N = max(nseq), phi = phis[1,1], omega = omega[1,1], start = 0))
++ 	running_est(chain = chain, phi = phis, Sigma = true_Sigmas, nseq = nseq)
++ }	
 > 
 > 
+> save(file = "ar1_running", sims_for_n, phis, true_Sigmas, nseq)
 > 
 > proc.time()
    user  system elapsed 
-555.664  35.224 109.836 
+103.241   6.264  22.556 

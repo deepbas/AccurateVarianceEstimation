@@ -17,32 +17,46 @@ for(i in 1:length(rho))
 
 	main_out <- sims_for_rho[[i]]
 
-
 	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][1,])))
 	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][2,])))
 	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][3,])))
 }
 
-# pdf("plots/ar1_batches.pdf", height = 6, width = 6)
+pdf("plots/ar1_batchesr1.pdf", height = 6, width = 6)
 plot(rho, lug1[,1], type = "n", 
-	ylim = range(cbind(lug1, lug2, lug3)),
+	ylim = range(lug1),
 	ylab = "Batch Size", xlab = expression(rho))
-for(i in 1:3)
-{
-  lines(rho, lug1[,i], col = i)
-  lines(rho, lug2[,i], col = i, lty = 2)
-  lines(rho, lug3[,i], col = i, lty = 3)
-}
-legend("topleft", legend = c("Exact", "Higher-order", "First-order", 
-                             "r = 1", "r = 2", "r = 3"), lty = c(1,1,1, 1, 2,3) , col = rep(1:3,2), ncol=2)
-# dev.off()
+for(i in 1:3) lines(rho, lug1[,i], col = i)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+dev.off()
+
+pdf("plots/ar1_batchesr2.pdf", height = 6, width = 6)
+plot(rho, lug2[,1], type = "n", 
+	ylim = range(lug2),
+	ylab = "Batch Size", xlab = expression(rho))
+for(i in 1:3) lines(rho, lug2[,i], col = i)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+dev.off()
+
+pdf("plots/ar1_batchesr3.pdf", height = 6, width = 6)
+plot(rho, lug2[,1], type = "n", 
+	ylim = range(lug3),
+	ylab = "Batch Size", xlab = expression(rho))
+for(i in 1:3) lines(rho, lug3[,i], col = i)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+dev.off()
+
+
+
+
 
 lug1 <- matrix(0, nrow = length(rho), ncol = 3)
 lug2 <- matrix(0, nrow = length(rho), ncol = 3)
 lug3 <- matrix(0, nrow = length(rho), ncol = 3)
 
-for(i in 1:length(rho))
-{
+i <- 21
+# for(i in 1:length(rho))
+# {
 	Sigma <- true_Sigmas[[i]]
 	phi <- phis[[i]]
 	rho_this <- rho[i]
@@ -53,7 +67,7 @@ for(i in 1:length(rho))
 	exact <- t(sapply(main_out, function(x) unlist(x[[2]])))
 	second <- t(sapply(main_out, function(x) unlist(x[[3]])))
 	first <- t(sapply(main_out, function(x) unlist(x[[4]])))
-}
+# }
 
 lug1 <- (cbind(exact[,1], second[,1], first[,1]))# - true_Sigmas[i][[1]][1,1])^2
 lug2 <- (cbind(exact[,2], second[,2], first[,2]))# - true_Sigmas[i][[1]][1,1])^2
@@ -64,16 +78,18 @@ colnames(lug2) <- c("exact", "second-order", "first-order")
 colnames(lug3) <- c("exact", "second-order", "first-order")
 
 sig <- as.matrix(true_Sigmas[[i]])
+pdf("plots/compare99.pdf", height = 12, width = 6)
 par(mfrow = c(3,1))
-boxplot(lug1, main = "r = 1", ylab = "MSE")
+boxplot(lug1, main = "r = 1", ylab = "BM Estimate")
 abline(h = sig[1,1])
 
-boxplot(lug2, main = "r = 2", ylab = "MSE")
+boxplot(lug2, main = "r = 2", ylab = "BM Estimate")
 abline(h = sig[1,1])
 
-boxplot(lug3, main = "r = 3", ylab = "MSE")
+boxplot(lug3, main = "r = 3", ylab = "BM Estimate")
 abline(h = sig[1,1])
-# dev.off()
+dev.off()
+
 
 colMeans( (lug1- sig[1,1])^2)/1e6
 colMeans( (lug2 - sig[1,1])^2)/1e6
@@ -81,3 +97,58 @@ colMeans( (lug3 - sig[1,1])^2)/1e6
 
 
 
+
+rm(list = ls())
+
+
+##############################
+## Analysing the running output
+##############################
+load("ar1_running")
+
+nreps 	<- length(sims_for_n)
+no.n <- length(sims_for_n[[1]])
+
+lug1 <- matrix(0, nrow = no.n, ncol = 3)
+lug2 <- matrix(0, nrow = no.n, ncol = 3)
+lug3 <- matrix(0, nrow = no.n, ncol = 3)
+
+rho <- .99
+
+Sigma <- true_Sigmas[1,1]
+phi <- phis[1,1]
+rho_this <- rho
+
+
+for(i in 1:no.n)
+{
+	main_out <- sims_for_n
+
+	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][1,])))
+	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][2,])))
+	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][3,])))
+}
+
+pdf("plots/ar1_run_r1.pdf", height = 6, width = 6)
+plot(nseq, lug1[,1], type = "n", 
+	ylim = range(lug1),
+	ylab = "Batch Size", xlab = "Sample size", main = "r = 1")
+for(i in 1:3) lines(nseq, lug1[,i], col = i)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+dev.off()
+
+pdf("plots/ar1_run_r2.pdf", height = 6, width = 6)
+plot(nseq, lug2[,1], type = "n", 
+	ylim = range(lug2),
+	ylab = "Batch Size", xlab = "Sample size", main = "r = 2")
+for(i in 1:3) lines(nseq, lug2[,i], col = i)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+dev.off()
+
+pdf("plots/ar1_run_r3.pdf", height = 6, width = 6)
+plot(nseq, lug2[,1], type = "n", 
+	ylim = range(lug3),
+	ylab = "Batch Size", xlab = "Sample size", main = "r = 3")
+for(i in 1:3) lines(nseq, lug3[,i], col = i)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+dev.off()
