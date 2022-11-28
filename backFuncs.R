@@ -25,9 +25,9 @@ sigphi <- function(p, rho)
 funBMexact <- function(b, x, y, r, c){
   n <- length(x)
   b <- floor(b)
-  br <- floor(b/r)
-  a <- floor(n/b)
-  ar <- floor(n/br)
+  br <- b/r
+  a <- n/b
+  ar <- n/br
 
   gamma0b1 <- 2*sum(x[2:b])
   gamma0b1r <- 2*sum(x[2:br])
@@ -45,9 +45,11 @@ funBMexact <- function(b, x, y, r, c){
           1/(ar - 1)*(gamma0n1r  -  gamma1n1r/n )          
   bias.exact <- y - ( (1/(1-c))*bias1 - (c/(1-c))*bias2)
 
-  variance.exact <- (2*y^2*b/n)* ( (b*c^2/(1-c)^2)/(n*r-b) - 
-    (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
-    c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2 )
+  # variance.exact <- (2*y^2*b/n)* ( (b*c^2/(1-c)^2)/(n*r-b) - 
+  #   (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
+  #   c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2 )
+  variance.exact <- (2*y^2*b/n)/(1 - c)^2 * (1 + b/(n-b) + 
+  c*(c-2)*( (1/r) + b/(r*(n*r - b))) )  
   mse.exact <- bias.exact^2 + variance.exact
   return(mse.exact)
 }
@@ -59,19 +61,24 @@ funBMexact <- function(b, x, y, r, c){
 funBMi <- function(b, x, y, r, c){
   n <- length(x)
   b <- floor(b)
-  br <- floor(b/r)
+  br <- b/r
   gamma0b1 <- 2*sum(x[2:b])
   gamma0b1r <- 2*sum(x[2:br])
   gamma0n1 <- 2*sum(x[2:n])
+
   gamma1b1 <- 2*sum((1:(b-1))*x[2:b])
   gamma1b1r <- 2*sum((1:(br-1))*x[2:br])
-  gamma1n1 <- 2*sum(x[2:n]*seq(1, n-1))
-  bias1 <- -((n/(n-b))*(gamma0n1 - gamma0b1 + gamma1b1/b + (b*gamma1n1)/(n^2)))
+  gamma1n1 <- 2*sum((1:(n-1))*x[2:n])
+  bias1 <- - ((n/(n-b)) *(gamma0n1 - gamma0b1 + gamma1b1/b + (b*gamma1n1)/(n^2)) )
   bias2 <- -((n/(n-br))*(gamma0n1 - gamma0b1r + gamma1b1r/br + (br*gamma1n1)/(n^2)))
+  
   bias <- (1/(1-c))* bias1 - (c/(1-c))* bias2
-  var <- (2*y^2*b/n)*( (b*c^2/(1-c)^2)/(n*r-b) - 
-    (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
-    c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2)
+  # var <- (2*y^2*b/n)*( (b*c^2/(1-c)^2)/(n*r-b) - 
+  #   (2*b*c)/((1-c)^2*r*(n*r-b)) + b/((1-c)^2*(n-b)) + 
+  #   c^2/(1-c)^2 - 2*c/((1-c)^2*r) + 1/(1-c)^2)
+
+  var <- (2*y^2*b/n)/(1 - c)^2 * (1 + b/(n-b) + 
+  c*(c-2)*( (1/r) + b/(r*(n*r - b))) )
   mse.bm <- bias^2 + var
   return(mse.bm)
 }
@@ -106,9 +113,10 @@ funOBMi <- function(b, x, y, r, c){
 # current
 funCurrbm <- function(b, x, y, r, c)
 {
-  mse.bm.curr <-  ((x/b)*(1-r*c)/(1-c))^2 + 
+  a <- n/b
+  mse.bm.curr <-  ((x*(a+1)/n)*(1-r*c)/(1-c))^2 + 
                   2*b/n*(y^2)*(1/r + (r-1)/(r*(1-c)^2)) 
-                  mse.bm.curr <- na.exclude(mse.bm.curr)
+                  # mse.bm.curr <- na.exclude(mse.bm.curr)
   return(mse.bm.curr)
 }
 
