@@ -44,8 +44,8 @@ batch_sizes <- function(chain, phi, Sigma, exact_autcov)
 		sigma.e	     <- ar.chain$var.pred
 		Sigma.pilot  <- sigma.e/(1 - sum(phi.i))^2
 
-		ar.autocovar <- acf(chain[,i], lag.max = n-1, 
-						type = "covariance", plot = FALSE)$acf
+		ar.autocovar <- as.numeric(acf(chain[,i], lag.max = n-1, 
+						type = "covariance", plot = FALSE)$acf)
 
 		foo <- 0
 		for(j in 1:m){
@@ -64,40 +64,46 @@ batch_sizes <- function(chain, phi, Sigma, exact_autcov)
   		# will combine outside loop
 		#%--------------------------------	
 
+		ar.autocovar <- ARMA.autocov(n = n, ar = phi.i, 
+							ma = 0, corr = FALSE)
 
-foo <- optim(par = c(40),
-                     fn = funBMexact, 
-                     x  = exact_autcov, 
-                     y  = diag(Sigma)[i], 
-                     r  = 2, c = c, 
-                     method = "Brent",
-                     lower = c(0), upper=c(5000))$par
-
-		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(100),
+		b.bm.exact[i,1:2] <- sapply(1:2, function(k) optim(par = c(100),
 		                     fn = funBMexact, 
-		                     x  = exact_autcov, 
+		                     x  = exact_autcov[,i], 
 		                     y  = diag(Sigma)[i], 
 		                     r  = k, c = c, 
 		                     method = "Brent", lower = 5, 
-		                     upper = ((k == 1)*5000 + (k >= 2)*(foo + 10) ) )$par)	
-
+		                     upper = n/2)$par)	
+		b.bm.exact[i,3]	<-	optim(par = c(5),
+		                     fn = funBMexact, 
+		                     x  = exact_autcov[,i], 
+		                     y  = diag(Sigma)[i], 
+		                     r  = 3, c = c, 
+		                     method = "Brent", lower = 5, 
+		                     upper = b.bm.exact[i,2])$par
 		# Estimated batch size - our method
-		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
-                       fn =funBMi,  
+		b.bm[i,1:2] <- sapply(1:2, function(k) optim(par = c(40),
+                       fn = funBMi,  
                        x  = ar.autocovar, 
                        y  = Sigma.pilot, 
                        r  = k, c = c, 
                        method = "Brent", lower = 5, 
-		               upper = ((k == 1)*5000 + (k >= 2)*(foo + 10) ) )$par)	
-
+		               upper = n/2)$par)	
+		b.bm[i,3]	<-	optim(par = c(5),
+		                     fn = funBMi, 
+		                     x  = ar.autocovar, 
+		                     y  = Sigma.pilot, 
+		                     r  = 3, c = c, 
+		                     method = "Brent", lower = 5, 
+		                     upper = b.bm[i,2])$par
 		# Current first order method
 		b.curr.bm[i, ] <- sapply(1:3, function(k)  optim(par = c(40), 
-                        fn = funCurrbm,  
+                        fn = funCurrbm, n = n,  
                         x  = gamma.pilot, 
                         y  = Sigma.pilot, 
                         r  = k, c = c, 
                         method = "Brent", lower = 5, 
-		                upper = ((k == 1)*5000 + (k >= 2)*(foo + 10) ) )$par)	
+		                upper = n/2)$par)	
 
 		# Politis method
 		ar.autocorr <- abs(acf(chain[,i], lag.max = n-1, 

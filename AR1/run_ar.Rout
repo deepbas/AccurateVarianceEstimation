@@ -1,6 +1,6 @@
 
-R version 4.0.2 (2020-06-22) -- "Taking Off Again"
-Copyright (C) 2020 The R Foundation for Statistical Computing
+R version 4.2.1 (2022-06-23) -- "Funny-Looking Kid"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-apple-darwin17.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -59,7 +59,7 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > # generating VAR(1) process
 > 
 > detectCores()
-[1] 8
+[1] 6
 > 
 > # leave 2 cores free for computer to work well
 > # this way you can walk Netflix and run code!
@@ -67,17 +67,6 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > # this tells the machine to register the 4 cores
 > registerDoParallel(cores = detectCores()-2)
 > 
-> ar1 <- function(N, phi, omega, start)
-+ {
-+ 	out <- numeric(length = N)
-+ 	out[1] <- start
-+ 	eps <- rnorm(N, sd = sqrt(omega))
-+ 	for(t in 2:N)
-+ 	{
-+ 		out[t] <- phi*out[t-1] + eps[t]
-+ 	}
-+ 	return(out)
-+ }
 > # for all values of rho
 > for(s in 1:length(rho))
 + {
@@ -127,4 +116,4 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > proc.time()
    user  system elapsed 
-555.664  35.224 109.836 
+196.158  45.201  65.807 

@@ -22,28 +22,31 @@ for(i in 1:length(rho))
 	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][3,])))
 }
 
-pdf("plots/ar1_batchesr1.pdf", height = 6, width = 6)
+pdf("plots/ar1_batchesr1.pdf", height = 5, width = 5)
 plot(rho, lug1[,1], type = "n", 
 	ylim = range(lug1),
 	ylab = "Batch Size", xlab = expression(rho))
 for(i in 1:3) lines(rho, lug1[,i], col = i)
-legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), 
+	lty = 1 , col = 1:3, bty = "n")
 dev.off()
 
-pdf("plots/ar1_batchesr2.pdf", height = 6, width = 6)
+pdf("plots/ar1_batchesr2.pdf", height = 5, width = 5)
 plot(rho, lug2[,1], type = "n", 
 	ylim = range(lug2),
 	ylab = "Batch Size", xlab = expression(rho))
 for(i in 1:3) lines(rho, lug2[,i], col = i)
-legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"),
+ lty = 1 , col = 1:3, bty = "n")
 dev.off()
 
-pdf("plots/ar1_batchesr3.pdf", height = 6, width = 6)
+pdf("plots/ar1_batchesr3.pdf", height = 5, width = 5)
 plot(rho, lug2[,1], type = "n", 
 	ylim = range(lug3),
 	ylab = "Batch Size", xlab = expression(rho))
 for(i in 1:3) lines(rho, lug3[,i], col = i)
-legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"),
+ lty = 1 , col = 1:3, bty = "n")
 dev.off()
 
 
@@ -129,26 +132,29 @@ for(i in 1:no.n)
 	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][3,])))
 }
 
-pdf("plots/ar1_run_r1.pdf", height = 6, width = 6)
+pdf("plots/ar1_run_r1.pdf", height = 5, width = 5)
 plot(nseq, lug1[,1], type = "n", 
 	ylim = range(lug1),
 	ylab = "Batch Size", xlab = "Sample size", main = "r = 1")
 for(i in 1:3) lines(nseq, lug1[,i], col = i)
-legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), 
+	lty = 1 , col = 1:3, bty = "n")
 dev.off()
 
-pdf("plots/ar1_run_r2.pdf", height = 6, width = 6)
+pdf("plots/ar1_run_r2.pdf", height = 5, width = 5)
 plot(nseq, lug2[,1], type = "n", 
 	ylim = range(lug2),
 	ylab = "Batch Size", xlab = "Sample size", main = "r = 2")
 for(i in 1:3) lines(nseq, lug2[,i], col = i)
-legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), 
+	lty = 1 , col = 1:3, bty = "n")
 dev.off()
 
-pdf("plots/ar1_run_r3.pdf", height = 6, width = 6)
+pdf("plots/ar1_run_r3.pdf", height = 5, width = 5)
 plot(nseq, lug2[,1], type = "n", 
 	ylim = range(lug3),
 	ylab = "Batch Size", xlab = "Sample size", main = "r = 3")
 for(i in 1:3) lines(nseq, lug3[,i], col = i)
-legend("topleft", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = 1:3)
+legend("topleft", legend = c("Exact", "Higher-order", "First-order"), 
+	lty = 1 , col = 1:3, bty = "n")
 dev.off()

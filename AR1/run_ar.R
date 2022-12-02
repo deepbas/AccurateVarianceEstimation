@@ -19,7 +19,7 @@ pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 p <- 1
 rho <- seq(0.95, 0.998, by = 0.002)
 n <- 5e3
-nrep <- 100
+nrep <- 1 # increase for estimation
 omega <- diag(p)
 #%-------------------------------------------------
 
@@ -36,17 +36,6 @@ detectCores()
 # this tells the machine to register the 4 cores
 registerDoParallel(cores = detectCores()-2)
 
-ar1 <- function(N, phi, omega, start)
-{
-	out <- numeric(length = N)
-	out[1] <- start
-	eps <- rnorm(N, sd = sqrt(omega))
-	for(t in 2:N)
-	{
-		out[t] <- phi*out[t-1] + eps[t]
-	}
-	return(out)
-}
 # for all values of rho
 for(s in 1:length(rho))
 {

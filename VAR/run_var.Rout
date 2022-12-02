@@ -1,7 +1,7 @@
 
 R version 4.2.1 (2022-06-23) -- "Funny-Looking Kid"
 Copyright (C) 2022 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+Platform: x86_64-apple-darwin17.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -79,7 +79,7 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > # generating VAR(1) process
 > 
 > detectCores()
-[1] 64
+[1] 6
 > 
 > # leave 2 cores free for computer to work well
 > # this way you can walk Netflix and run code!
@@ -103,7 +103,7 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 + 	{
 + 
 + 		chain <- as.matrix(mAr.sim(rep(0,p), as.matrix(phis[[s]]), omega, N = n))
-+ 		est_var(chain = chain, phi = phis[[s]], Sigma = true_Sigmas[[s]], exact_autcov = exact_autcov)
++ 		est_var(chain = as.matrix(chain[,1]), phi = phis[[s]], Sigma = true_Sigmas[[s]], exact_autcov = exact_autcov)
 + 	}	
 + }
 [1] "Doing rho =  0.8"
@@ -129,4 +129,4 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > proc.time()
     user   system  elapsed 
-5122.871  144.977  131.895 
+1394.425   82.113  409.790 

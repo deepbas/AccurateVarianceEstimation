@@ -3,23 +3,6 @@ source("batchSizes.R")
 source("../backFuncs.R")
 
 
-############
-# Function that calculates true autocov for VAR(1)
-true_autocov <- function(phi, V, lag)
-{
-	foo <- svd(phi)
-	d <- foo$d
-
-	out <- matrix(0, nrow = lag+1, ncol = length(d))
-	for(k in 0:lag)
-	{
-		out[k+1, ] <- diag(foo$u %*% diag(d^k) %*% t(foo$v) %*% V)
-	}
-	
-	return(out)
-}
-
-
 #%-------------------------------------------------
 pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 
@@ -72,7 +55,7 @@ for(s in 1:length(rho))
 	{
 
 		chain <- as.matrix(mAr.sim(rep(0,p), as.matrix(phis[[s]]), omega, N = n))
-		est_var(chain = chain, phi = phis[[s]], Sigma = true_Sigmas[[s]], exact_autcov = exact_autcov)
+		est_var(chain = as.matrix(chain[,1]), phi = phis[[s]], Sigma = true_Sigmas[[s]], exact_autcov = exact_autcov)
 	}	
 }
 

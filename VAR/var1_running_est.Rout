@@ -66,7 +66,7 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 + 	{
 + 		n.ind <- nseq[nind]
 + 		sub.chain <- matrix(chain[1:n.ind, ])
-+ 		batchObj <- batch_sizes(sub.chain, phi, Sigma)
++ 		batchObj <- batch_sizes(sub.chain, phi, Sigma, exact_autcov)
 + 
 + 		exactBM		<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,1]), r = k)$cov)
 + 		secondBM 	<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,2]), r = k)$cov)
@@ -83,15 +83,18 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > 
 > # Simulation settings
-> p <- 1
+> p <- 5
 > rho <- .99
-> nrep <- 100
+> nrep <- 10
 > omega <- diag(p)
 > #%-------------------------------------------------
 > 
 > true_Sigmas  <- list(length = length(rho))
+> Vs  		 <- list(length = length(rho))
 > phis		 <- list(length = length(rho))
 > sims_for_n <- list(length = length(rho))
+> #%-------------------------------------------------
+> 
 > # generating VAR(1) process
 > 
 > detectCores()
@@ -105,10 +108,15 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 > 
 > 
 > # for all values of rho
-> temp 	<- sigphi(p, rho)
-> phis 	<- temp[[1]]
-> true_Sigmas	<- temp[[2]]
-> nseq <- c(1e3, 3e3, 5e3, 1e4, 2e4, 5e4)
+> temp 		<- sigphi(p, rho	)
+> phis		<- temp[[1]]
+> true_Sigmas <- temp[[2]]
+> Vs			<- temp[[3]]
+> 
+> nseq <- c(1e3, 3e3) #, 5e3, 1e4, 2e4, 5e4)
+> 
+> exact_autcov <- true_autocov(phi = phis, V = Vs, lag = max(nseq)-1)
+> 
 > ## a doParallel for reps
 > sims_for_n 	<- foreach(st = 1:nrep) %dopar% 
 + {
@@ -117,8 +125,8 @@ doParallel     Matrix  ts.extend        mAr     mcmcse
 + }	
 > 
 > 
-> save(file = "ar1_running", sims_for_n, phis, true_Sigmas, nseq)
+> save(file = "var1_running", sims_for_n, phis, true_Sigmas, nseq)
 > 
 > proc.time()
    user  system elapsed 
-361.430  24.545  98.003 
+  1.686   0.412   1.571 

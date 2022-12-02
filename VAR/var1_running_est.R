@@ -34,9 +34,10 @@ running_est <- function(chain, phi, Sigma,
 	est_n <- list(length(nseq))
 	for(nind in 1:length(nseq))
 	{
+		print(nind)
 		n.ind <- nseq[nind]
-		sub.chain <- matrix(chain[1:n.ind, ])
-		batchObj <- batch_sizes(sub.chain, phi, Sigma)
+		sub.chain <- as.matrix(chain[1:n.ind, ])
+		batchObj <- batch_sizes(sub.chain, phi, Sigma, exact_autcov[1:n.ind, ])
 
 		exactBM		<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,1]), r = k)$cov)
 		secondBM 	<- lapply(1:3, function(k) mcse.multi(sub.chain, size = ceiling(batchObj[[1]][k,2]), r = k)$cov)
@@ -53,15 +54,18 @@ running_est <- function(chain, phi, Sigma,
 
 
 # Simulation settings
-p <- 1
-rho <- .99
-nrep <- 100
+p <- 5
+rho <- .95
+nrep <- 10
 omega <- diag(p)
 #%-------------------------------------------------
 
 true_Sigmas  <- list(length = length(rho))
+Vs  		 <- list(length = length(rho))
 phis		 <- list(length = length(rho))
 sims_for_n <- list(length = length(rho))
+#%-------------------------------------------------
+
 # generating VAR(1) process
 
 detectCores()
@@ -74,16 +78,22 @@ registerDoParallel(cores = detectCores()-2)
 
 
 # for all values of rho
-temp 	<- sigphi(p, rho)
-phis 	<- temp[[1]]
-true_Sigmas	<- temp[[2]]
-nseq <- c(1e3, 3e3, 5e3, 1e4, 2e4, 5e4)
+temp 		<- sigphi(p, rho)
+phis		<- temp[[1]]
+true_Sigmas <- temp[[2]]
+Vs			<- temp[[3]]
+
+nseq <- floor(seq(1e3, 1e5, length = 500))
+
+exact_autcov <- true_autocov(phi = phis, V = Vs, lag = max(nseq)-1)
+
 ## a doParallel for reps
 sims_for_n 	<- foreach(st = 1:nrep) %dopar% 
 {
-	chain <- as.matrix(ar1(N = max(nseq), phi = phis[1,1], omega = omega[1,1], start = 0))
+	print(st)
+	chain <- as.matrix(mAr.sim(rep(0,p), as.matrix(phis), omega, N = max(nseq)))
 	running_est(chain = chain, phi = phis, Sigma = true_Sigmas, nseq = nseq)
 }	
 
 
-save(file = "ar1_running", sims_for_n, phis, true_Sigmas, nseq)
+save(file = "var1_running", sims_for_n, phis, true_Sigmas, nseq)

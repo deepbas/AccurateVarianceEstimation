@@ -68,7 +68,7 @@ batch_sizes <- function(chain, phi, Sigma)
 		ar.autocovar   <- ARMA.autocov(n = n, ar = phi.i, 
 							ma = 0, corr = FALSE)
 
-		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(100),
+		b.bm.exact[i, ] <- sapply(1:3, function(k) optim(par = c(40),
 		                     fn = funBMexact, 
 		                     x  = exact.autocov, 
 		                     y  = diag(Sigma)[i], 
@@ -79,8 +79,8 @@ batch_sizes <- function(chain, phi, Sigma)
 		# Estimated batch size - our method
 		b.bm[i, ] <- sapply(1:3, function(k) optim(par = c(40),
                        fn =funBMi,  
-                       x  = ar.autocovar, 
-                       y  = Sigma.pilot, 
+                       x  = exact.autocov, # do ar.autocov for estimated quantities
+                       y  = diag(Sigma)[i], # do Sigma.pilot for estimated quantities
                        r  = k, c = c, 
                        method = "Brent", lower = 5, 
 		               upper = n/2)$par)	
@@ -89,8 +89,8 @@ batch_sizes <- function(chain, phi, Sigma)
 		b.curr.bm[i, ] <- sapply(1:3, function(k)  optim(par = c(40), 
                         fn = funCurrbm, 
                         n  = n, 
-                        x  = gamma.pilot, 
-                        y  = Sigma.pilot, 
+                        x  = -2*sum( (0:(n-1)* exact.autocov)), # gamma.pilot for estim
+                        y  = diag(Sigma)[i], # Sigma.pilot for estimated quantities
                         r  = k, c = c, 
                         method = "Brent", lower = 5, 
 		                upper = n/2 )$par)	
