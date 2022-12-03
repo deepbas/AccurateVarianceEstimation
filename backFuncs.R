@@ -38,6 +38,7 @@ ar1 <- function(N, phi, omega, start)
 # Function that calculates true autocov for VAR(1)
 true_autocov <- function(phi, V, lag)
 {
+  # to calculate the powers of phi
   foo <- svd(phi)
   d <- foo$d
 

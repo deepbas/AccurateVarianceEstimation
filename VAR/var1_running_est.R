@@ -19,6 +19,8 @@ pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 #%-------------------------------------------------
 ############################################
 ## file runs running estimation
+## of optimal batch sizes and resulting variance
+## estimators
 ############################################
 
 
@@ -26,12 +28,12 @@ pkgs <- c("doParallel", "Matrix", "ts.extend", "mAr", "mcmcse")
 # p = dimension of the problem
 # Sigma =  true matrix to be estimated
 # phi = phi in VAR(1)
-
-running_est <- function(chain, phi, Sigma, 
-	nseq = c(1e3, 3e3, 5e3, 1e4, 2e4, 5e4))
+# nseq = sequence of ns where to calculate batch size etc
+running_est <- function(chain, phi, Sigma, nseq)
 {
-	# Find all batch sizes
+	
 	est_n <- list(length(nseq))
+
 	for(nind in 1:length(nseq))
 	{
 		print(nind)
@@ -48,7 +50,6 @@ running_est <- function(chain, phi, Sigma,
 		"exactBM" = exactBM, "secondBM" = secondBM,
 		"firstBM" = firstBM, "politBM" = politBM)
 	}
-
 	return(est_n)
 }
 
@@ -56,7 +57,7 @@ running_est <- function(chain, phi, Sigma,
 # Simulation settings
 p <- 5
 rho <- .95
-nrep <- 10
+nrep <- 100
 omega <- diag(p)
 #%-------------------------------------------------
 
@@ -77,14 +78,16 @@ detectCores()
 registerDoParallel(cores = detectCores()-2)
 
 
-# for all values of rho
-temp 		<- sigphi(p, rho)
-phis		<- temp[[1]]
+# calculating phi and truths
+temp 				<- sigphi(p, rho)
+phis				<- temp[[1]]
 true_Sigmas <- temp[[2]]
-Vs			<- temp[[3]]
+Vs					<- temp[[3]]
 
-nseq <- floor(seq(1e3, 1e5, length = 500))
+# where to find batch sizes etc
+nseq <- floor(seq(1e3, 1e5, length = 250))
 
+# exact autocov for each function
 exact_autcov <- true_autocov(phi = phis, V = Vs, lag = max(nseq)-1)
 
 ## a doParallel for reps

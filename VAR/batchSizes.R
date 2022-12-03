@@ -3,10 +3,10 @@
 ############################################
 
 
-# n = length of Markov chain
 # p = dimension of the problem
 # Sigma =  true matrix to be estimated
 # phi = phi in VAR(1)
+# exact_autcov = exact autocov for VAR model
 batch_sizes <- function(chain, phi, Sigma, exact_autcov)
 {
 	p 			<- dim(chain)[2]
@@ -74,6 +74,9 @@ batch_sizes <- function(chain, phi, Sigma, exact_autcov)
 		                     r  = k, c = c, 
 		                     method = "Brent", lower = 5, 
 		                     upper = n/2)$par)	
+		
+		# r = 3 is not convex, but the minima is smaller
+		# than the answer for r = 2
 		b.bm.exact[i,3]	<-	optim(par = c(5),
 		                     fn = funBMexact, 
 		                     x  = exact_autcov[,i], 
@@ -89,6 +92,9 @@ batch_sizes <- function(chain, phi, Sigma, exact_autcov)
                        r  = k, c = c, 
                        method = "Brent", lower = 5, 
 		               upper = n/2)$par)	
+		
+		# r = 3 is not convex, but the minima is smaller
+		# than the answer for r = 2
 		b.bm[i,3]	<-	optim(par = c(5),
 		                     fn = funBMi, 
 		                     x  = ar.autocovar, 
@@ -139,6 +145,8 @@ batch_sizes <- function(chain, phi, Sigma, exact_autcov)
 	return(list(b.sizes, b.politis))
 }
 
+# Function calculates the variance from the resulting
+# batch sizes
 est_var <- function(chain, phi, Sigma, exact_autcov)
 {
 	# Find all batch sizes
