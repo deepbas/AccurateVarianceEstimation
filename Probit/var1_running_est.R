@@ -51,6 +51,9 @@ b.gen <- function(n.sim){
   return(b)
 }
 
+
+
+
 #%-------------------------------------------------
 ############################################
 ## file runs running estimation
@@ -114,5 +117,6 @@ sims_for_lupus 	<- foreach(st = 1:nrep) %dopar%
 	running_est(chain = lupus_chain, nseq = nseq)
 	
 }	
+
 
 save(file = "var1_running", sims_for_lupus, nseq)
