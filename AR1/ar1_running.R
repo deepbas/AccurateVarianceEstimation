@@ -56,7 +56,7 @@ running_est <- function(chain, phi, Sigma,
 # Simulation settings
 p <- 1
 rho <- .99
-nrep <- 100
+nrep <- 1
 omega <- diag(p)
 #%-------------------------------------------------
 
@@ -84,7 +84,7 @@ sims_for_n 	<- foreach(st = 1:nrep) %dopar%
 {
 	print(st)
 	chain <- as.matrix(ar1(N = max(nseq), phi = phis, omega = omega[1,1], start = 0))
-	running_est(chain = chain, phi = as.matrix(phis), Sigma = true_Sigmas, nseq = nseq)
+	running_est(chain = chain, phi = as.matrix(phis), Sigma = as.matrix(true_Sigmas), nseq = nseq)
 }	
 
 
