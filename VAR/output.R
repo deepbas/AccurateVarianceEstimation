@@ -1,7 +1,7 @@
 ##############################
 ## Analysing the output
 ##############################
-load("var_out")
+load("var_batch")
 
 nreps 	<- length(sims_for_rho[[1]])
 
@@ -18,9 +18,9 @@ for(i in 1:length(rho))
 	main_out <- sims_for_rho[[i]]
 
 
-	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][1,])))
-	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][2,])))
-	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][3,])))
+	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][1,])))
+	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][2,])))
+	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][3,])))
 }
 
 pdf("plots/var_batches.pdf", height = 6, width = 6)
@@ -56,7 +56,7 @@ no.n <- length(sims_for_n[[1]])
 lug1 <- matrix(0, nrow = no.n, ncol = 3)
 lug2 <- matrix(0, nrow = no.n, ncol = 3)
 lug3 <- matrix(0, nrow = no.n, ncol = 3)
-poli <- numeric(length = no.n)
+
 
 Sigma <- true_Sigmas
 phi <- phis
@@ -66,10 +66,9 @@ for(i in 1:no.n)
 {
 	main_out <- sims_for_n
 
-	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][1,])))
-	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][2,])))
-	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][[1]][3,])))
-	poli[i]		<- Reduce(mean, lapply(main_out, function(x) x[[i]][[1]][[2]]))
+	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][1,])))
+	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][2,])))
+	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][3,])))
 }
 
 pdf("plots/var1_run_r1.pdf", height = 6, width = 6)
@@ -82,11 +81,10 @@ dev.off()
 
 pdf("plots/var1_run_r2.pdf", height = 6, width = 6)
 plot(nseq, lug2[,1], type = "n", 
-	ylim = range(lug2, poli),
+	ylim = range(lug2),
 	ylab = "Batch Size", xlab = "Sample size", main = "r = 2")
 for(i in 1:3) lines(nseq, lug2[,i], col = i)
-lines(nseq, poli, col = i, lty = 2)
-legend("topleft", bty = "n", legend = c("Exact", "Higher-order", "First-order", "Politis"), lty = c(1,1,1,2) , col = c(1:3, 3))
+legend("topleft", bty = "n", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = c(1:3))
 dev.off()
 
 pdf("plots/var1_run_r3.pdf", height = 6, width = 6)
@@ -107,7 +105,6 @@ dev.off()
 lug1 <- matrix(0, nrow = no.n, ncol = 3)
 lug2 <- matrix(0, nrow = no.n, ncol = 3)
 lug3 <- matrix(0, nrow = no.n, ncol = 3)
-poli <- numeric(length = no.n)
 
 Sigma <- as.matrix(Sigma)
 for(i in 1:no.n)
@@ -121,7 +118,6 @@ for(i in 1:no.n)
 	lug2[i, 1] <- mean(Reduce(c, lapply(main_out, function(x) det(x[[i]][[2]][[2]]) )))
 	lug2[i, 2] <- mean(Reduce(c, lapply(main_out, function(x) det(x[[i]][[3]][[2]]) )))
 	lug2[i, 3] <- mean(Reduce(c, lapply(main_out, function(x) det(x[[i]][[4]][[2]]) )))
-	poli[i]		 <- mean(Reduce(c, lapply(main_out, function(x) det(x[[i]]$politBM) )))
 
 	lug3[i, 1] <- mean(Reduce(c, lapply(main_out, function(x) det(x[[i]][[2]][[3]]) )))
 	lug3[i, 2] <- mean(Reduce(c, lapply(main_out, function(x) det(x[[i]][[3]][[3]]) )))
@@ -129,7 +125,7 @@ for(i in 1:no.n)
 }
 
 
-lims <- range(c(lug1,  lug3, det(Sigma)))
+lims <- range(c(lug1, lug2,  lug3, det(Sigma)))
 pdf(paste0("plots/det_r", 1,".pdf"), height = 5, width = 5)
 plot(nseq, lug1[, 1], type = "l", ylim = lims,
 	ylab = "Determinant", xlab = "Sample Size")
@@ -145,9 +141,8 @@ plot(nseq, lug2[, 1], type = "l", ylim = lims,
 	ylab = "Determinant", xlab = "Sample Size")
 lines(nseq, lug2[, 2], col = "red")
 lines(nseq, lug2[, 3], col = "green")
-lines(nseq, poli, col = "green", lty = 2)
-legend("bottomright", bty = "n", legend = c("Exact", "Higher-order", "First-order", "Politis", "Truth"), 
-	lty = c(1,1,1,2, 1) , col = c(1:3, 3, "purple"))
+legend("right", bty = "n", legend = c("Exact", "Higher-order", "First-order", "Truth"), 
+	lty = 1 , col = c(1:3, "purple"))
 abline(h = det(Sigma), col = "purple")
 dev.off()
 
@@ -171,7 +166,6 @@ dev.off()
 lug1 <- matrix(0, nrow = no.n, ncol = 3)
 lug2 <- matrix(0, nrow = no.n, ncol = 3)
 lug3 <- matrix(0, nrow = no.n, ncol = 3)
-poli <- numeric(length = no.n)
 
 Sigma <- as.matrix(Sigma)
 for(i in 1:no.n)
@@ -185,7 +179,6 @@ for(i in 1:no.n)
 	lug2[i, 1] <- mean(Reduce(c, lapply(main_out, function(x) norm(x[[i]][[2]][[2]] - Sigma, "F")/norm(Sigma, "F") )))
 	lug2[i, 2] <- mean(Reduce(c, lapply(main_out, function(x) norm(x[[i]][[3]][[2]] - Sigma, "F")/norm(Sigma, "F") )))
 	lug2[i, 3] <- mean(Reduce(c, lapply(main_out, function(x) norm(x[[i]][[4]][[2]] - Sigma, "F")/norm(Sigma, "F") )))
-	poli[i]		 <- mean(Reduce(c, lapply(main_out, function(x) norm(x[[i]]$politBM - Sigma, "F")/norm(Sigma, "F") )))
 
 	lug3[i, 1] <- mean(Reduce(c, lapply(main_out, function(x) norm(x[[i]][[2]][[3]] - Sigma, "F")/norm(Sigma, "F") )))
 	lug3[i, 2] <- mean(Reduce(c, lapply(main_out, function(x) norm(x[[i]][[3]][[3]] - Sigma, "F")/norm(Sigma, "F") )))
@@ -208,8 +201,7 @@ plot(nseq, lug2[, 1], type = "l", ylim = lims,
 	ylab = "Relative Frobenius Norm", xlab = "Sample Size")
 lines(nseq, lug2[, 2], col = "red")
 lines(nseq, lug2[, 3], col = "green")
-lines(nseq, poli, col = "green", lty = 2)
-legend("top", bty = "n", legend = c("Exact", "Higher-order", "First-order", "Politis"), lty = c(1,1,1,2) , col = c(1:3, 3))
+legend("top", bty = "n", legend = c("Exact", "Higher-order", "First-order"), lty = 1 , col = c(1:3))
 dev.off()
 
 pdf(paste0("plots/norm_r", 3,".pdf"), height = 5, width = 5)
