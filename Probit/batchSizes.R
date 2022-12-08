@@ -22,11 +22,8 @@ batch_sizes <- function(chain)
 	Sigma.pilot <- numeric(length = p)
 	gamma.pilot <- numeric(length = p)
 	
-	b.politis	<- numeric(length = p)
 	b.bm 		<- matrix(0, nrow = p, ncol = 3, 
 					dimnames = list(NULL, c("r = 1", "r = 2", "r = 3")))
-	# b.bm.exact	<- matrix(0, nrow = p, ncol = 3, 
-	# 			dimnames = list(NULL, c("r = 1", "r = 2", "r = 3")))
 	b.curr.bm	<- matrix(0, nrow = p, ncol = 3, 
 				dimnames = list(NULL, c("r = 1", "r = 2", "r = 3")))
 	
@@ -67,24 +64,6 @@ batch_sizes <- function(chain)
 		ar.autocovar <- ARMA.autocov(n = n, ar = phi.i, 
 							ma = 0, corr = FALSE)
 
-		# b.bm.exact[i,1:2] <- sapply(1:2, function(k) optim(par = c(100),
-		#                      fn = funBMexact, 
-		#                      x  = exact_autcov[,i], 
-		#                      y  = diag(Sigma)[i], 
-		#                      r  = k, c = c, 
-		#                      method = "Brent", lower = 5, 
-		#                      upper = n/2)$par)	
-		# 
-		# # r = 3 is not convex, but the minima is smaller
-		# # than the answer for r = 2
-		# b.bm.exact[i,3]	<-	optim(par = c(5),
-		#                      fn = funBMexact, 
-		#                      x  = exact_autcov[,i], 
-		#                      y  = diag(Sigma)[i], 
-		#                      r  = 3, c = c, 
-		#                      method = "Brent", lower = 5, 
-		#                      upper = b.bm.exact[i,2])$par
-		# Estimated batch size - our method
 		b.bm[i,1:2] <- sapply(1:2, function(k) optim(par = c(40),
                        fn = funBMi,  
                        x  = ar.autocovar, 
@@ -110,39 +89,16 @@ batch_sizes <- function(chain)
                         r  = k, c = c, 
                         method = "Brent", lower = 5, 
 		                upper = n/2)$par)	
-
-		# Politis method
-		ar.autocorr <- abs(acf(chain[,i], lag.max = n-1, 
-						type = "correlation", plot = FALSE)$acf)
-		#ARMA.autocov(n = n, ar = phi.i[[i]], ma = 0, corr = TRUE)
-
-		politis <- TRUE
-		ind <- 0
-		while(politis)
-		{
-			foo_again <- which(ar.autocorr < ubound)
-			pol.r <-  foo_again[which(foo_again > ind)] [1]
-			if( all(ar.autocorr[pol.r: (pol.r + 5)] < ubound) )
-			{
-				b.politis[i] <- 2*pol.r
-				politis <- FALSE
-			} else{
-				ind <- pol.r + 5
-			}
-		}
-		#%--------------------------------		
 	}
 
 	# Taking geometric means
-	# b.exact <- apply(b.bm.exact, 2, function(x) exp(mean(log(x))))
 	b.bm.opt <- apply(b.bm, 2, function(x) exp(mean(log(x))))
 	b.currbm.opt <- apply(b.curr.bm, 2, function(x) exp(mean(log(x))))
-	b.politis <- exp(mean(log(b.politis)))
 
 	b.sizes <- cbind(b.bm.opt, b.currbm.opt)
 	colnames(b.sizes) <- c("secondOpt", "firstOpt")
 
-	return(list(b.sizes, b.politis))
+	return(b.sizes)
 }
 
 # Function calculates the variance from the resulting
@@ -152,14 +108,12 @@ est_var <- function(chain)
 	# Find all batch sizes
 	batchObj <- batch_sizes(chain)
 
-#	exactBM		<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[[1]][k,1]), r = k)$cov)
-	secondBM 	<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[[1]][k,1]), r = k)$cov)
-	firstBM 	<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[[1]][k,2]), r = k)$cov)
-	politBM 	<- mcse.multi(chain, size = ceiling(batchObj[[2]]), r = 2)$cov
+	secondBM 	<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[k,1]), r = k)$cov)
+	firstBM 	<- lapply(1:3, function(k) mcse.multi(chain, size = ceiling(batchObj[k,2]), r = k)$cov)
 
 	return(list("batches" = batchObj,
 		"secondBM" = secondBM,
-		"firstBM" = firstBM, "politBM" = politBM))
+		"firstBM" = firstBM))
 }
 
 

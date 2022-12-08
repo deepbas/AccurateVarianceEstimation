@@ -1,7 +1,7 @@
 ##############################
 ## Analysing the output
 ##############################
-load("ar1_out")
+load("ar1_batch")
 
 nreps 	<- length(sims_for_rho[[1]])
 
@@ -17,9 +17,9 @@ for(i in 1:length(rho))
 
 	main_out <- sims_for_rho[[i]]
 
-	lug1[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][1,])))
-	lug2[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][2,])))
-	lug3[i, ] <- colMeans(Reduce(rbind, lapply(main_out, function(x) x[[1]][[1]][3,])))
+	lug1[i, ] <- Reduce(c, lapply(main_out, function(x) x[[1]][1,]))
+	lug2[i, ] <- Reduce(c, lapply(main_out, function(x) x[[1]][2,]))
+	lug3[i, ] <- Reduce(c, lapply(main_out, function(x) x[[1]][3,]))
 }
 
 pdf("plots/ar1_batchesr1.pdf", height = 5, width = 5)
@@ -48,55 +48,6 @@ for(i in 1:3) lines(rho, lug3[,i], col = i)
 legend("topleft", legend = c("Exact", "Higher-order", "First-order"),
  lty = 1 , col = 1:3, bty = "n")
 dev.off()
-
-
-
-
-
-lug1 <- matrix(0, nrow = length(rho), ncol = 3)
-lug2 <- matrix(0, nrow = length(rho), ncol = 3)
-lug3 <- matrix(0, nrow = length(rho), ncol = 3)
-
-i <- 21
-# for(i in 1:length(rho))
-# {
-	Sigma <- true_Sigmas[[i]]
-	phi <- phis[[i]]
-	rho_this <- rho[i]
-
-	main_out <- sims_for_rho[[i]]
-
-
-	exact <- t(sapply(main_out, function(x) unlist(x[[2]])))
-	second <- t(sapply(main_out, function(x) unlist(x[[3]])))
-	first <- t(sapply(main_out, function(x) unlist(x[[4]])))
-# }
-
-lug1 <- (cbind(exact[,1], second[,1], first[,1]))# - true_Sigmas[i][[1]][1,1])^2
-lug2 <- (cbind(exact[,2], second[,2], first[,2]))# - true_Sigmas[i][[1]][1,1])^2
-lug3 <- (cbind(exact[,3], second[,3], first[,3]))# - true_Sigmas[i][[1]][1,1])^2
-
-colnames(lug1) <- c("exact", "second-order", "first-order")
-colnames(lug2) <- c("exact", "second-order", "first-order")
-colnames(lug3) <- c("exact", "second-order", "first-order")
-
-sig <- as.matrix(true_Sigmas[[i]])
-pdf("plots/compare99.pdf", height = 12, width = 6)
-par(mfrow = c(3,1))
-boxplot(lug1, main = "r = 1", ylab = "BM Estimate")
-abline(h = sig[1,1])
-
-boxplot(lug2, main = "r = 2", ylab = "BM Estimate")
-abline(h = sig[1,1])
-
-boxplot(lug3, main = "r = 3", ylab = "BM Estimate")
-abline(h = sig[1,1])
-dev.off()
-
-
-colMeans( (lug1- sig[1,1])^2)/1e6
-colMeans( (lug2 - sig[1,1])^2)/1e6
-colMeans( (lug3 - sig[1,1])^2)/1e6
 
 
 
