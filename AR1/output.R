@@ -78,9 +78,9 @@ for(i in 1:no.n)
 {
 	main_out <- sims_for_n
 
-	lug1[i, ] <- Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][1,]))
-	lug2[i, ] <- Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][2,]))
-	lug3[i, ] <- Reduce(rbind, lapply(main_out, function(x) x[[i]][[1]][3,]))
+	lug1[i, ] <- colMeans(do.call(rbind, lapply(main_out, function(x) x[[i]][[1]][1,])))
+	lug2[i, ] <- colMeans(do.call(rbind, lapply(main_out, function(x) x[[i]][[1]][2,])))
+	lug3[i, ] <- colMeans(do.call(rbind, lapply(main_out, function(x) x[[i]][[1]][3,])))
 }
 
 pdf("plots/ar1_run_r1.pdf", height = 5, width = 5)

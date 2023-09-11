@@ -1,7 +1,3 @@
-## -----------------------------------------------------
-# Function to simulate the posterior samples in the lupus example
-# Acknowledgements: Dootika Vats
-
 inv.portkey <- function(prop, curr, beta = 0.99, pf, Cprop, Ccurr, ...) 
 {
   x <- NA

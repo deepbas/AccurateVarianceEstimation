@@ -56,7 +56,7 @@ running_est <- function(chain, phi, Sigma,
 # Simulation settings
 p <- 1
 rho <- .99
-nrep <- 1
+nrep <- 5
 omega <- diag(p)
 #%-------------------------------------------------
 
@@ -77,7 +77,7 @@ registerDoParallel(cores = detectCores()-2)
 # for all values of rho
 phis 	<- rho
 true_Sigmas	<- 1/(1 - rho)^2
-nseq <- floor(seq(1e3, 5e4, length = 100))
+nseq <- floor(seq(1e3, 5e4, length = 300))
 
 ## a doParallel for reps
 sims_for_n 	<- foreach(st = 1:nrep) %dopar% 

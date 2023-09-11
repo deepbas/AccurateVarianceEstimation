@@ -56,7 +56,7 @@ running_est <- function(chain, phi, Sigma, nseq)
 # Simulation settings
 p <- 5
 rho <- .95
-nrep <- 100
+nrep <- 200
 omega <- diag(p)
 #%-------------------------------------------------
 

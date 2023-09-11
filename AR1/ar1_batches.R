@@ -44,7 +44,7 @@ for(s in 1:length(rho))
 	phis[[s]] 	<- temp[[1]]
 	true_Sigmas[[s]] 	<- temp[[2]]
 
-	## a doParallel for reps
+	## a do Parallel for reps
 	sims_for_rho[[s]] 	<- foreach(st = 1:nrep) %dopar% 
 	{
 		chain <- as.matrix(ar1(N = n, phi = phis[[s]][1,1], omega = omega[1,1], start = 0))
