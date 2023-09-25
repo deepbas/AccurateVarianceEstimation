@@ -1,2 +1,2 @@
 # AccurateVarianceEstimation
-Codes for paper on Accurate Variance Estimation in MCMC and time series
+Codes for Higher Order Optimal Batch Sizes for Estimating Long-run Variances.
